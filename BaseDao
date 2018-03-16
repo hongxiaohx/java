@@ -1,0 +1,93 @@
+import java.sql.*;
+import java.util.List;
+/**
+*@author:hongxiao on 2018-3-16
+*@description JDBC连接MYSQL数据库
+*/
+public class BaseDao {
+
+    private String url="jdbc:mysql://127.0.0.1:3306/mytestmvc";
+    private String user="root";
+    private String pwd="H****";
+    private Connection conn=null;
+    private PreparedStatement pst=null;
+    private ResultSet rs=null;
+
+    static{
+        try{
+            Class.forName("com.mysql.jdbc.Driver");
+        }catch (ClassNotFoundException e){
+            e.printStackTrace();
+        }
+    }
+
+    private void getConnection(){
+        if(conn==null){
+            try{
+                conn= DriverManager.getConnection(url,user,pwd);
+            }catch (SQLException e){
+                e.printStackTrace();
+            }
+        }
+    }
+    public ResultSet executeQuery(String sql, List<Object> params){
+        getConnection();
+
+        try{
+            pst=conn.prepareStatement(sql);
+            if(params!=null&&params.size()>0){
+                for(int i=0;i<params.size();i++){
+                    pst.setObject(i+1,params.get(i));
+                }
+            }
+            rs=pst.executeQuery();
+        }catch (SQLException e){
+            e.printStackTrace();
+        }
+        return rs;
+    }
+    public int executeUpdate(String sql,List<Object> params){
+        getConnection();
+        int result=0;
+        try{
+            pst=conn.prepareStatement(sql);
+            if(params!=null&&params.size()>0){
+                for(int i=0;i<params.size();i++) {
+                    pst.setObject(i + 1, params.get(i));
+                }
+            }
+            result=pst.executeUpdate();
+        }catch (SQLException e){
+            e.printStackTrace();
+        }
+        return result;
+    }
+    public void close(){
+        if(rs!=null){
+            try{
+                rs.close();
+                rs=null;
+            }catch (SQLException e){
+                e.printStackTrace();
+            }
+        }
+        if(pst!=null){
+            try{
+                pst.close();
+                pst=null;
+            }catch (SQLException e){
+                e.printStackTrace();
+            }
+        }
+        if(conn!=null){
+            try{
+                conn.close();
+                conn=null;
+            }catch (SQLException e){
+                e.printStackTrace();
+            }
+        }
+    }
+
+
+}
