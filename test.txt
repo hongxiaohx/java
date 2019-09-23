@@ -1,4 +1,5 @@
 Class People{
 public String name;
 public int id;
+public String address;
 }
